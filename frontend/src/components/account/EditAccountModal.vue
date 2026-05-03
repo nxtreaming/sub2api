@@ -43,6 +43,8 @@
                     ? 'https://cloudcode-pa.googleapis.com'
                     : account.platform === 'minimax'
                       ? 'https://api.minimaxi.com/anthropic'
+                      : account.platform === 'kimi'
+                        ? 'https://api.kimi.com/coding'
                       : 'https://api.anthropic.com'
             "
           />
@@ -67,6 +69,8 @@
                     ? 'sk-...'
                     : account.platform === 'minimax'
                       ? 'sk-...'
+                      : account.platform === 'kimi'
+                        ? 'sk-kimi-...'
                       : 'sk-ant-...'
             "
           />
@@ -2178,6 +2182,7 @@ const baseUrlHint = computed(() => {
   if (props.account.platform === 'openai') return t('admin.accounts.openai.baseUrlHint')
   if (props.account.platform === 'gemini') return t('admin.accounts.gemini.baseUrlHint')
   if (props.account.platform === 'minimax') return 'MiniMax Anthropic-compatible base URL, default https://api.minimaxi.com/anthropic'
+  if (props.account.platform === 'kimi') return 'Kimi Code Anthropic-compatible base URL, default https://api.kimi.com/coding'
   return t('admin.accounts.baseUrlHint')
 })
 
@@ -2389,6 +2394,7 @@ const defaultBaseUrl = computed(() => {
   if (props.account?.platform === 'openai') return 'https://api.openai.com'
   if (props.account?.platform === 'gemini') return 'https://generativelanguage.googleapis.com'
   if (props.account?.platform === 'minimax') return 'https://api.minimaxi.com/anthropic'
+  if (props.account?.platform === 'kimi') return 'https://api.kimi.com/coding'
   return 'https://api.anthropic.com'
 })
 
@@ -2603,9 +2609,11 @@ const syncFormFromAccount = (newAccount: Account | null) => {
         ? 'https://api.openai.com'
         : newAccount.platform === 'gemini'
           ? 'https://generativelanguage.googleapis.com'
-          : newAccount.platform === 'minimax'
-            ? 'https://api.minimaxi.com/anthropic'
-            : 'https://api.anthropic.com'
+        : newAccount.platform === 'minimax'
+          ? 'https://api.minimaxi.com/anthropic'
+          : newAccount.platform === 'kimi'
+            ? 'https://api.kimi.com/coding'
+          : 'https://api.anthropic.com'
     editBaseUrl.value = (credentials.base_url as string) || platformDefaultUrl
 
     // Load model mappings and detect mode
@@ -2728,9 +2736,11 @@ const syncFormFromAccount = (newAccount: Account | null) => {
         ? 'https://api.openai.com'
         : newAccount.platform === 'gemini'
           ? 'https://generativelanguage.googleapis.com'
-          : newAccount.platform === 'minimax'
-            ? 'https://api.minimaxi.com/anthropic'
-            : 'https://api.anthropic.com'
+        : newAccount.platform === 'minimax'
+          ? 'https://api.minimaxi.com/anthropic'
+          : newAccount.platform === 'kimi'
+            ? 'https://api.kimi.com/coding'
+          : 'https://api.anthropic.com'
     editBaseUrl.value = platformDefaultUrl
 
     // Load model mappings for OpenAI OAuth accounts

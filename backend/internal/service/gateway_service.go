@@ -46,6 +46,8 @@ const (
 	claudeAPICountTokensURL = "https://api.anthropic.com/v1/messages/count_tokens?beta=true"
 	miniMaxAPIURL           = "https://api.minimaxi.com/anthropic/v1/messages"
 	miniMaxCountTokensURL   = "https://api.minimaxi.com/anthropic/v1/messages/count_tokens"
+	kimiAPIURL              = "https://api.kimi.com/coding/v1/messages"
+	kimiCountTokensURL      = "https://api.kimi.com/coding/v1/messages/count_tokens"
 	stickySessionTTL        = time.Hour // 粘性会话TTL
 	defaultMaxLineSize      = 500 * 1024 * 1024
 	// Canonical Claude Code banner. Keep it EXACT (no trailing whitespace/newlines)
@@ -3776,6 +3778,10 @@ func tokenTypeUsesBearer(tokenType string) bool {
 	return tokenType == "oauth" || tokenType == "bearer" || tokenType == "service_account"
 }
 
+func platformUsesAnthropicCompatibleURL(platform string) bool {
+	return platform == PlatformMiniMax || platform == PlatformKimi
+}
+
 func (s *GatewayService) getOAuthToken(ctx context.Context, account *Account) (string, string, error) {
 	// 对于 Anthropic OAuth 账号，使用 ClaudeTokenProvider 获取缓存的 token
 	if account.Platform == PlatformAnthropic && account.Type == AccountTypeOAuth && s.claudeTokenProvider != nil {
@@ -5947,6 +5953,8 @@ func (s *GatewayService) buildUpstreamRequest(ctx context.Context, c *gin.Contex
 	targetURL := claudeAPIURL
 	if account.Platform == PlatformMiniMax {
 		targetURL = miniMaxAPIURL
+	} else if account.Platform == PlatformKimi {
+		targetURL = kimiAPIURL
 	}
 	if account.Type == AccountTypeAPIKey {
 		baseURL := account.GetBaseURL()
@@ -5955,7 +5963,7 @@ func (s *GatewayService) buildUpstreamRequest(ctx context.Context, c *gin.Contex
 			if err != nil {
 				return nil, err
 			}
-			if account.Platform == PlatformMiniMax {
+			if platformUsesAnthropicCompatibleURL(account.Platform) {
 				targetURL = validatedURL + "/v1/messages"
 			} else {
 				targetURL = validatedURL + "/v1/messages?beta=true"
@@ -9150,6 +9158,8 @@ func (s *GatewayService) buildCountTokensRequest(ctx context.Context, c *gin.Con
 	targetURL := claudeAPICountTokensURL
 	if account.Platform == PlatformMiniMax {
 		targetURL = miniMaxCountTokensURL
+	} else if account.Platform == PlatformKimi {
+		targetURL = kimiCountTokensURL
 	}
 	if account.Type == AccountTypeAPIKey {
 		baseURL := account.GetBaseURL()
@@ -9158,7 +9168,7 @@ func (s *GatewayService) buildCountTokensRequest(ctx context.Context, c *gin.Con
 			if err != nil {
 				return nil, err
 			}
-			if account.Platform == PlatformMiniMax {
+			if platformUsesAnthropicCompatibleURL(account.Platform) {
 				targetURL = validatedURL + "/v1/messages/count_tokens"
 			} else {
 				targetURL = validatedURL + "/v1/messages/count_tokens?beta=true"

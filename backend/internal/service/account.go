@@ -168,6 +168,10 @@ func (a *Account) IsMiniMax() bool {
 	return a.Platform == PlatformMiniMax
 }
 
+func (a *Account) IsKimi() bool {
+	return a.Platform == PlatformKimi
+}
+
 func (a *Account) GeminiOAuthType() string {
 	if a.Platform != PlatformGemini || a.Type != AccountTypeOAuth {
 		return ""
@@ -489,6 +493,9 @@ func (a *Account) resolveModelMapping(rawMapping map[string]any) map[string]stri
 		if a.Platform == domain.PlatformMiniMax {
 			return domain.DefaultMiniMaxModelMapping
 		}
+		if a.Platform == domain.PlatformKimi {
+			return domain.DefaultKimiModelMapping
+		}
 		// Bedrock 默认映射由 forwardBedrock 统一处理（需配合 region prefix 调整）
 		return nil
 	}
@@ -499,6 +506,9 @@ func (a *Account) resolveModelMapping(rawMapping map[string]any) map[string]stri
 		}
 		if a.Platform == domain.PlatformMiniMax {
 			return domain.DefaultMiniMaxModelMapping
+		}
+		if a.Platform == domain.PlatformKimi {
+			return domain.DefaultKimiModelMapping
 		}
 		return nil
 	}
@@ -526,6 +536,9 @@ func (a *Account) resolveModelMapping(rawMapping map[string]any) map[string]stri
 	}
 	if a.Platform == domain.PlatformMiniMax {
 		return domain.DefaultMiniMaxModelMapping
+	}
+	if a.Platform == domain.PlatformKimi {
+		return domain.DefaultKimiModelMapping
 	}
 	return nil
 }
@@ -740,6 +753,9 @@ func (a *Account) GetBaseURL() string {
 	if baseURL == "" {
 		if a.Platform == PlatformMiniMax {
 			return "https://api.minimaxi.com/anthropic"
+		}
+		if a.Platform == PlatformKimi {
+			return "https://api.kimi.com/coding"
 		}
 		return "https://api.anthropic.com"
 	}

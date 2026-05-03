@@ -57,6 +57,24 @@ func TestGetBaseURL(t *testing.T) {
 			expected: "https://minimax.example.com/anthropic",
 		},
 		{
+			name: "kimi apikey without base_url returns default anthropic-compatible endpoint",
+			account: Account{
+				Type:        AccountTypeAPIKey,
+				Platform:    PlatformKimi,
+				Credentials: map[string]any{},
+			},
+			expected: "https://api.kimi.com/coding",
+		},
+		{
+			name: "kimi apikey with custom base_url",
+			account: Account{
+				Type:        AccountTypeAPIKey,
+				Platform:    PlatformKimi,
+				Credentials: map[string]any{"base_url": "https://kimi.example.com/coding"},
+			},
+			expected: "https://kimi.example.com/coding",
+		},
+		{
 			name: "antigravity apikey auto-appends /antigravity",
 			account: Account{
 				Type:        AccountTypeAPIKey,

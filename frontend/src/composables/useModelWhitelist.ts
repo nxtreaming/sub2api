@@ -155,6 +155,10 @@ const moonshotModels = [
   'kimi-latest'
 ]
 
+const kimiCodeModels = [
+  'kimi-for-coding'
+]
+
 // 字节跳动 豆包
 const doubaoModels = [
   'doubao-pro-256k', 'doubao-pro-128k', 'doubao-pro-32k', 'doubao-pro-4k',
@@ -215,6 +219,7 @@ const allModelsList: string[] = [
   ...cohereModels,
   ...yiModels,
   ...moonshotModels,
+  ...kimiCodeModels,
   ...doubaoModels,
   ...minimaxModels,
   ...baiduModels,
@@ -308,6 +313,11 @@ const bedrockPresetMappings = [
   { label: 'Haiku 4.5', from: 'claude-haiku-4-5', to: 'us.anthropic.claude-haiku-4-5-20251001-v1:0', color: 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400' },
 ]
 
+const kimiPresetMappings = [
+  { label: 'Claude→Kimi', from: 'claude-*', to: 'kimi-for-coding', color: 'bg-rose-100 text-rose-700 hover:bg-rose-200 dark:bg-rose-900/30 dark:text-rose-400' },
+  { label: 'Kimi Code', from: 'kimi-for-coding', to: 'kimi-for-coding', color: 'bg-pink-100 text-pink-700 hover:bg-pink-200 dark:bg-pink-900/30 dark:text-pink-400' }
+]
+
 // Antigravity 默认映射（从后端 API 获取，与 constants.go 保持一致）
 // 使用 fetchAntigravityDefaultMappings() 异步获取
 import { getAntigravityDefaultModelMapping } from '@/api/admin/accounts'
@@ -363,6 +373,7 @@ export function getModelsByPlatform(platform: string): string[] {
     case 'cohere': return cohereModels
     case 'yi': return yiModels
     case 'moonshot': return moonshotModels
+    case 'kimi': return kimiCodeModels
     case 'doubao': return doubaoModels
     case 'minimax': return minimaxModels
     case 'baidu': return baiduModels
@@ -378,6 +389,7 @@ export function getPresetMappingsByPlatform(platform: string) {
   if (platform === 'openai') return openaiPresetMappings
   if (platform === 'gemini') return geminiPresetMappings
   if (platform === 'antigravity') return antigravityPresetMappings
+  if (platform === 'kimi') return kimiPresetMappings
   if (platform === 'bedrock') return bedrockPresetMappings
   return anthropicPresetMappings
 }

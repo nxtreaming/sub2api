@@ -409,6 +409,8 @@ const currentFiles = computed((): FileConfig[] => {
         ]
       case 'minimax':
         return [generateOpenCodeConfig('minimax', apiBase, apiKey)]
+      case 'kimi':
+        return [generateOpenCodeConfig('kimi', apiBase, apiKey)]
       default:
         return [generateOpenCodeConfig('openai', apiBase, apiKey)]
     }
@@ -1008,6 +1010,17 @@ function generateOpenCodeConfig(platform: string, baseUrl: string, apiKey: strin
     provider[platform].models = antigravityGeminiModels
   } else if (platform === 'openai') {
     provider[platform].models = openaiModels
+  } else if (platform === 'kimi') {
+    provider[platform].npm = '@ai-sdk/anthropic'
+    provider[platform].models = {
+      'kimi-for-coding': {
+        name: 'Kimi Code',
+        limit: {
+          context: 262144,
+          output: 32768
+        }
+      }
+    }
   }
 
   const agent =

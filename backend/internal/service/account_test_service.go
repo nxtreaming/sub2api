@@ -33,6 +33,7 @@ var sseDataPrefix = regexp.MustCompile(`^data:\s*`)
 const (
 	testClaudeAPIURL   = "https://api.anthropic.com/v1/messages?beta=true"
 	testMiniMaxAPIURL  = "https://api.minimaxi.com/anthropic/v1/messages"
+	testKimiAPIURL     = "https://api.kimi.com/coding/v1/messages"
 	chatgptCodexAPIURL = "https://chatgpt.com/backend-api/codex/responses"
 )
 
@@ -235,6 +236,7 @@ func (s *AccountTestService) testClaudeAccountConnection(c *gin.Context, account
 		}
 	} else if account.Type == "apikey" {
 		// MiniMax Token Plan uses Bearer auth on its Anthropic-compatible endpoint.
+		// Kimi Code follows Anthropic API key semantics.
 		useBearer = account.Platform == PlatformMiniMax
 		authToken = account.GetCredential("api_key")
 		if authToken == "" {
@@ -253,6 +255,11 @@ func (s *AccountTestService) testClaudeAccountConnection(c *gin.Context, account
 			apiURL = strings.TrimSuffix(normalizedBaseURL, "/") + "/v1/messages"
 			if baseURL == "https://api.minimaxi.com/anthropic" {
 				apiURL = testMiniMaxAPIURL
+			}
+		} else if account.Platform == PlatformKimi {
+			apiURL = strings.TrimSuffix(normalizedBaseURL, "/") + "/v1/messages"
+			if baseURL == "https://api.kimi.com/coding" || baseURL == "https://api.kimi.com/coding/" {
+				apiURL = testKimiAPIURL
 			}
 		} else {
 			apiURL = strings.TrimSuffix(normalizedBaseURL, "/") + "/v1/messages?beta=true"
@@ -301,7 +308,9 @@ func (s *AccountTestService) testClaudeAccountConnection(c *gin.Context, account
 		}
 		req.Header.Set("Authorization", "Bearer "+authToken)
 	} else {
-		req.Header.Set("anthropic-beta", claude.APIKeyBetaHeader)
+		if account.Platform != PlatformKimi {
+			req.Header.Set("anthropic-beta", claude.APIKeyBetaHeader)
+		}
 		req.Header.Set("x-api-key", authToken)
 	}
 

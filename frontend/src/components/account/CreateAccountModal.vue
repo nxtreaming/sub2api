@@ -160,6 +160,19 @@
             <Icon name="key" size="sm" />
             MiniMax
           </button>
+          <button
+            type="button"
+            @click="form.platform = 'kimi'"
+            :class="[
+              'flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all',
+              form.platform === 'kimi'
+                ? 'bg-white text-rose-600 shadow-sm dark:bg-dark-600 dark:text-rose-400'
+                : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+            ]"
+          >
+            <Icon name="sparkles" size="sm" />
+            Kimi
+          </button>
         </div>
       </div>
 
@@ -363,6 +376,22 @@
             <div>
               <span class="block text-sm font-medium text-gray-900 dark:text-white">Token Plan API Key</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">Anthropic-compatible Bearer API</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Type Selection (Kimi) -->
+      <div v-if="form.platform === 'kimi'">
+        <label class="input-label">{{ t('admin.accounts.accountType') }}</label>
+        <div class="mt-2 rounded-lg border-2 border-rose-500 bg-rose-50 p-3 text-left dark:bg-rose-900/20">
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500 text-white">
+              <Icon name="sparkles" size="sm" />
+            </div>
+            <div>
+              <span class="block text-sm font-medium text-gray-900 dark:text-white">Kimi Code API Key</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">Anthropic-compatible API</span>
             </div>
           </div>
         </div>
@@ -1052,6 +1081,8 @@
                   ? 'https://generativelanguage.googleapis.com'
                   : form.platform === 'minimax'
                     ? 'https://api.minimaxi.com/anthropic'
+                    : form.platform === 'kimi'
+                      ? 'https://api.kimi.com/coding'
                     : 'https://api.anthropic.com'
             "
           />
@@ -1071,6 +1102,8 @@
                   ? 'AIza...'
                   : form.platform === 'minimax'
                     ? 'sk-...'
+                    : form.platform === 'kimi'
+                      ? 'sk-kimi-...'
                     : 'sk-ant-...'
             "
           />
@@ -3204,6 +3237,7 @@ const baseUrlHint = computed(() => {
   if (form.platform === 'openai') return t('admin.accounts.openai.baseUrlHint')
   if (form.platform === 'gemini') return t('admin.accounts.gemini.baseUrlHint')
   if (form.platform === 'minimax') return 'MiniMax Anthropic-compatible base URL, default https://api.minimaxi.com/anthropic'
+  if (form.platform === 'kimi') return 'Kimi Code Anthropic-compatible base URL, default https://api.kimi.com/coding'
   return t('admin.accounts.baseUrlHint')
 })
 
@@ -3211,6 +3245,7 @@ const apiKeyHint = computed(() => {
   if (form.platform === 'openai') return t('admin.accounts.openai.apiKeyHint')
   if (form.platform === 'gemini') return t('admin.accounts.gemini.apiKeyHint')
   if (form.platform === 'minimax') return 'Use your MiniMax Token Plan API key. It will be sent as Authorization: Bearer.'
+  if (form.platform === 'kimi') return 'Use your Kimi Code API key from the Kimi Code Console.'
   return t('admin.accounts.apiKeyHint')
 })
 
@@ -3635,6 +3670,8 @@ watch(
           ? 'https://generativelanguage.googleapis.com'
           : newPlatform === 'minimax'
             ? 'https://api.minimaxi.com/anthropic'
+            : newPlatform === 'kimi'
+              ? 'https://api.kimi.com/coding'
             : 'https://api.anthropic.com'
     // Clear model-related settings
     allowedModels.value = []
@@ -3648,7 +3685,7 @@ watch(
       antigravityWhitelistModels.value = []
       accountCategory.value = 'oauth-based'
       antigravityAccountType.value = 'oauth'
-    } else if (newPlatform === 'minimax') {
+    } else if (newPlatform === 'minimax' || newPlatform === 'kimi') {
       accountCategory.value = 'apikey'
       allowOverages.value = false
       antigravityWhitelistModels.value = []
@@ -4432,6 +4469,8 @@ const handleSubmit = async () => {
         ? 'https://generativelanguage.googleapis.com'
         : form.platform === 'minimax'
           ? 'https://api.minimaxi.com/anthropic'
+          : form.platform === 'kimi'
+            ? 'https://api.kimi.com/coding'
           : 'https://api.anthropic.com'
 
   // Build credentials with optional model mapping

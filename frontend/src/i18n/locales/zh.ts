@@ -98,6 +98,7 @@ export default {
       gemini: 'Gemini',
       antigravity: 'Antigravity',
       minimax: 'MiniMax',
+      kimi: 'Kimi',
       more: '更多'
     },
     // CTA 区块
@@ -2057,6 +2058,8 @@ export default {
         openai: 'OpenAI',
         gemini: 'Gemini',
         antigravity: 'Antigravity',
+        minimax: 'MiniMax',
+        kimi: 'Kimi',
       },
       saving: '保存中...',
       noGroups: '暂无分组',
@@ -2811,6 +2814,8 @@ export default {
         anthropic: 'Anthropic',
         gemini: 'Gemini',
         antigravity: 'Antigravity',
+        minimax: 'MiniMax',
+        kimi: 'Kimi',
       },
       types: {
         oauth: 'OAuth',

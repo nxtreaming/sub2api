@@ -23,6 +23,7 @@ const (
 	PlatformGemini      = "gemini"
 	PlatformAntigravity = "antigravity"
 	PlatformMiniMax     = "minimax"
+	PlatformKimi        = "kimi"
 )
 
 // Account type constants
@@ -123,6 +124,13 @@ var DefaultMiniMaxModelMapping = map[string]string{
 	"MiniMax-M2.7":           "MiniMax-M2.7",
 	"MiniMax-M2.7-highspeed": "MiniMax-M2.7-highspeed",
 	"claude-*":               "MiniMax-M2.7",
+}
+
+// DefaultKimiModelMapping maps Claude-compatible client model names to the
+// stable Kimi Code subscription model ID.
+var DefaultKimiModelMapping = map[string]string{
+	"kimi-for-coding": "kimi-for-coding",
+	"claude-*":        "kimi-for-coding",
 }
 
 // DefaultBedrockModelMapping 是 AWS Bedrock 平台的默认模型映射

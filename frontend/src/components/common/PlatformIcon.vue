@@ -23,6 +23,10 @@
   <svg v-else-if="platform === 'minimax'" :class="sizeClass" viewBox="0 0 24 24" fill="currentColor">
     <path d="M3 18V6h3.2l5.8 7.1L17.8 6H21v12h-3.4v-6.6l-4.3 5.1h-2.6l-4.3-5.1V18H3z" />
   </svg>
+  <!-- Kimi logo (simple K mark) -->
+  <svg v-else-if="platform === 'kimi'" :class="sizeClass" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M4 20V4h3.6v6.3L14.1 4h4.8l-7 6.8L20 20h-4.8l-5.9-6.8-1.7 1.6V20H4z" />
+  </svg>
   <!-- Fallback: generic platform icon -->
   <svg v-else :class="sizeClass" fill="currentColor" viewBox="0 0 24 24">
     <path
