@@ -39,6 +39,24 @@ func TestGetBaseURL(t *testing.T) {
 			expected: "https://custom.example.com",
 		},
 		{
+			name: "minimax apikey without base_url returns default anthropic-compatible endpoint",
+			account: Account{
+				Type:        AccountTypeAPIKey,
+				Platform:    PlatformMiniMax,
+				Credentials: map[string]any{},
+			},
+			expected: "https://api.minimaxi.com/anthropic",
+		},
+		{
+			name: "minimax apikey with custom base_url",
+			account: Account{
+				Type:        AccountTypeAPIKey,
+				Platform:    PlatformMiniMax,
+				Credentials: map[string]any{"base_url": "https://minimax.example.com/anthropic"},
+			},
+			expected: "https://minimax.example.com/anthropic",
+		},
+		{
 			name: "antigravity apikey auto-appends /antigravity",
 			account: Account{
 				Type:        AccountTypeAPIKey,

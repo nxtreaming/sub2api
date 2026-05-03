@@ -32,6 +32,7 @@ var sseDataPrefix = regexp.MustCompile(`^data:\s*`)
 
 const (
 	testClaudeAPIURL   = "https://api.anthropic.com/v1/messages?beta=true"
+	testMiniMaxAPIURL  = "https://api.minimaxi.com/anthropic/v1/messages"
 	chatgptCodexAPIURL = "https://chatgpt.com/backend-api/codex/responses"
 )
 
@@ -220,19 +221,21 @@ func (s *AccountTestService) testClaudeAccountConnection(c *gin.Context, account
 	// Determine authentication method and API URL
 	var authToken string
 	var useBearer bool
+	var useOAuthBeta bool
 	var apiURL string
 
 	if account.IsOAuth() {
 		// OAuth or Setup Token - use Bearer token
 		useBearer = true
+		useOAuthBeta = true
 		apiURL = testClaudeAPIURL
 		authToken = account.GetCredential("access_token")
 		if authToken == "" {
 			return s.sendErrorAndEnd(c, "No access token available")
 		}
 	} else if account.Type == "apikey" {
-		// API Key - use x-api-key header
-		useBearer = false
+		// MiniMax Token Plan uses Bearer auth on its Anthropic-compatible endpoint.
+		useBearer = account.Platform == PlatformMiniMax
 		authToken = account.GetCredential("api_key")
 		if authToken == "" {
 			return s.sendErrorAndEnd(c, "No API key available")
@@ -246,7 +249,14 @@ func (s *AccountTestService) testClaudeAccountConnection(c *gin.Context, account
 		if err != nil {
 			return s.sendErrorAndEnd(c, fmt.Sprintf("Invalid base URL: %s", err.Error()))
 		}
-		apiURL = strings.TrimSuffix(normalizedBaseURL, "/") + "/v1/messages?beta=true"
+		if account.Platform == PlatformMiniMax {
+			apiURL = strings.TrimSuffix(normalizedBaseURL, "/") + "/v1/messages"
+			if baseURL == "https://api.minimaxi.com/anthropic" {
+				apiURL = testMiniMaxAPIURL
+			}
+		} else {
+			apiURL = strings.TrimSuffix(normalizedBaseURL, "/") + "/v1/messages?beta=true"
+		}
 	} else {
 		return s.sendErrorAndEnd(c, fmt.Sprintf("Unsupported account type: %s", account.Type))
 	}
@@ -284,7 +294,11 @@ func (s *AccountTestService) testClaudeAccountConnection(c *gin.Context, account
 
 	// Set authentication header
 	if useBearer {
-		req.Header.Set("anthropic-beta", claude.DefaultBetaHeader)
+		if useOAuthBeta {
+			req.Header.Set("anthropic-beta", claude.DefaultBetaHeader)
+		} else {
+			req.Header.Set("anthropic-beta", claude.APIKeyBetaHeader)
+		}
 		req.Header.Set("Authorization", "Bearer "+authToken)
 	} else {
 		req.Header.Set("anthropic-beta", claude.APIKeyBetaHeader)

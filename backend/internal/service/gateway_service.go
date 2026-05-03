@@ -44,6 +44,8 @@ import (
 const (
 	claudeAPIURL            = "https://api.anthropic.com/v1/messages?beta=true"
 	claudeAPICountTokensURL = "https://api.anthropic.com/v1/messages/count_tokens?beta=true"
+	miniMaxAPIURL           = "https://api.minimaxi.com/anthropic/v1/messages"
+	miniMaxCountTokensURL   = "https://api.minimaxi.com/anthropic/v1/messages/count_tokens"
 	stickySessionTTL        = time.Hour // 粘性会话TTL
 	defaultMaxLineSize      = 500 * 1024 * 1024
 	// Canonical Claude Code banner. Keep it EXACT (no trailing whitespace/newlines)
@@ -3747,6 +3749,9 @@ func (s *GatewayService) GetAccessToken(ctx context.Context, account *Account) (
 		if apiKey == "" {
 			return "", "", errors.New("api_key not found in credentials")
 		}
+		if account.Platform == PlatformMiniMax {
+			return apiKey, "bearer", nil
+		}
 		return apiKey, "apikey", nil
 	case AccountTypeBedrock:
 		return "", "bedrock", nil // Bedrock 使用 SigV4 签名或 API Key，由 forwardBedrock 处理
@@ -3765,6 +3770,10 @@ func (s *GatewayService) GetAccessToken(ctx context.Context, account *Account) (
 	default:
 		return "", "", fmt.Errorf("unsupported account type: %s", account.Type)
 	}
+}
+
+func tokenTypeUsesBearer(tokenType string) bool {
+	return tokenType == "oauth" || tokenType == "bearer" || tokenType == "service_account"
 }
 
 func (s *GatewayService) getOAuthToken(ctx context.Context, account *Account) (string, string, error) {
@@ -5936,6 +5945,9 @@ func (s *GatewayService) buildUpstreamRequest(ctx context.Context, c *gin.Contex
 
 	// 确定目标URL
 	targetURL := claudeAPIURL
+	if account.Platform == PlatformMiniMax {
+		targetURL = miniMaxAPIURL
+	}
 	if account.Type == AccountTypeAPIKey {
 		baseURL := account.GetBaseURL()
 		if baseURL != "" {
@@ -5943,7 +5955,11 @@ func (s *GatewayService) buildUpstreamRequest(ctx context.Context, c *gin.Contex
 			if err != nil {
 				return nil, err
 			}
-			targetURL = validatedURL + "/v1/messages?beta=true"
+			if account.Platform == PlatformMiniMax {
+				targetURL = validatedURL + "/v1/messages"
+			} else {
+				targetURL = validatedURL + "/v1/messages?beta=true"
+			}
 		}
 	} else if account.IsCustomBaseURLEnabled() {
 		customURL := account.GetCustomBaseURL()
@@ -6008,7 +6024,7 @@ func (s *GatewayService) buildUpstreamRequest(ctx context.Context, c *gin.Contex
 	}
 
 	// 设置认证头（保持原始大小写）
-	if tokenType == "oauth" {
+	if tokenTypeUsesBearer(tokenType) {
 		setHeaderRaw(req.Header, "authorization", "Bearer "+token)
 	} else {
 		setHeaderRaw(req.Header, "x-api-key", token)
@@ -9132,6 +9148,9 @@ func (s *GatewayService) buildCountTokensRequestAnthropicAPIKeyPassthrough(
 func (s *GatewayService) buildCountTokensRequest(ctx context.Context, c *gin.Context, account *Account, body []byte, token, tokenType, modelID string, mimicClaudeCode bool) (*http.Request, error) {
 	// 确定目标 URL
 	targetURL := claudeAPICountTokensURL
+	if account.Platform == PlatformMiniMax {
+		targetURL = miniMaxCountTokensURL
+	}
 	if account.Type == AccountTypeAPIKey {
 		baseURL := account.GetBaseURL()
 		if baseURL != "" {
@@ -9139,7 +9158,11 @@ func (s *GatewayService) buildCountTokensRequest(ctx context.Context, c *gin.Con
 			if err != nil {
 				return nil, err
 			}
-			targetURL = validatedURL + "/v1/messages/count_tokens?beta=true"
+			if account.Platform == PlatformMiniMax {
+				targetURL = validatedURL + "/v1/messages/count_tokens"
+			} else {
+				targetURL = validatedURL + "/v1/messages/count_tokens?beta=true"
+			}
 		}
 	} else if account.IsCustomBaseURLEnabled() {
 		customURL := account.GetCustomBaseURL()
@@ -9194,7 +9217,7 @@ func (s *GatewayService) buildCountTokensRequest(ctx context.Context, c *gin.Con
 	}
 
 	// 设置认证头（保持原始大小写）
-	if tokenType == "oauth" {
+	if tokenTypeUsesBearer(tokenType) {
 		setHeaderRaw(req.Header, "authorization", "Bearer "+token)
 	} else {
 		setHeaderRaw(req.Header, "x-api-key", token)

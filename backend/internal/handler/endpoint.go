@@ -85,7 +85,7 @@ func DeriveUpstreamEndpoint(inbound, rawRequestPath, platform string) string {
 		}
 		return EndpointResponses
 
-	case service.PlatformAnthropic:
+	case service.PlatformAnthropic, service.PlatformMiniMax:
 		return EndpointMessages
 
 	case service.PlatformGemini:

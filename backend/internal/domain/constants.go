@@ -22,6 +22,7 @@ const (
 	PlatformOpenAI      = "openai"
 	PlatformGemini      = "gemini"
 	PlatformAntigravity = "antigravity"
+	PlatformMiniMax     = "minimax"
 )
 
 // Account type constants
@@ -114,6 +115,14 @@ var DefaultAntigravityModelMapping = map[string]string{
 	// 其他官方模型
 	"gpt-oss-120b-medium":    "gpt-oss-120b-medium",
 	"tab_flash_lite_preview": "tab_flash_lite_preview",
+}
+
+// DefaultMiniMaxModelMapping maps common Claude-compatible client model names
+// to MiniMax Token Plan models. Account-level model_mapping can override this.
+var DefaultMiniMaxModelMapping = map[string]string{
+	"MiniMax-M2.7":           "MiniMax-M2.7",
+	"MiniMax-M2.7-highspeed": "MiniMax-M2.7-highspeed",
+	"claude-*":               "MiniMax-M2.7",
 }
 
 // DefaultBedrockModelMapping 是 AWS Bedrock 平台的默认模型映射

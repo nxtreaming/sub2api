@@ -97,6 +97,7 @@ export default {
       claude: 'Claude',
       gemini: 'Gemini',
       antigravity: 'Antigravity',
+      minimax: 'MiniMax',
       more: 'More'
     },
     // CTA section
